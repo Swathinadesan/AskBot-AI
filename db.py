@@ -1,16 +1,8 @@
 """
 MongoDB connection for Placementor AI.
 
-The connection string now comes from the MONGO_URI environment variable
-instead of being hardcoded, so the same code works locally (.env file)
-and in production (Render environment variables) without any changes.
-
-Collections are unchanged from the original project:
-- users          : registered student accounts
-- admins         : admin accounts
-- chat_history    : every chat exchange (question, answer, source, etc.)
-- questions       : legacy collection populated by scripts/upload_pdf.py
-- qa_data         : the live knowledge base the chatbot searches first
+Uses MONGO_URI from environment variables.
+Works locally with .env and on Render with Environment Variables.
 """
 
 import os
@@ -20,36 +12,85 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.errors import ConfigurationError, PyMongoError
 
+# Load .env when running locally
 load_dotenv()
 
+# Read MongoDB connection string
 MONGO_URI = os.environ.get("MONGO_URI", "").strip()
 
+# Check whether MONGO_URI exists
 if not MONGO_URI:
     sys.exit(
         "MONGO_URI is not set.\n"
-        "Create a .env file in the project root (see .env.example) and set:\n"
-        "  MONGO_URI=your-mongodb-connection-string\n"
-        "or export MONGO_URI as an environment variable before starting the app."
+        "Set MONGO_URI in your .env file locally or "
+        "in Render Environment Variables."
     )
 
+# ---------------------------------------------------------
+# TEMPORARY DEBUG
+# ---------------------------------------------------------
+# This does NOT print your password.
+print("========================================")
+print("MongoDB Environment Check")
+print("MONGO_URI exists:", bool(MONGO_URI))
+print("MONGO_URI starts with:", MONGO_URI[:30])
+print("========================================")
+
+
+# ---------------------------------------------------------
+# MongoDB CONNECTION
+# ---------------------------------------------------------
 try:
-   client = MongoClient("mongodb+srv://placementuser:PlacementAI47@cluster0.aqpcxah.mongodb.net/?appName=Cluster0")
+    client = MongoClient(
+        MONGO_URI,
+        serverSelectionTimeoutMS=10000
+    )
+
 except ConfigurationError as exc:
     sys.exit(f"MONGO_URI looks invalid: {exc}")
 
+
+# ---------------------------------------------------------
+# DATABASE
+# ---------------------------------------------------------
 db = client["placement_ai"]
 
+
+# ---------------------------------------------------------
+# COLLECTIONS
+# ---------------------------------------------------------
 users = db["users"]
+
 admins = db["admins"]
+
 chat_collection = db["chat_history"]
+
 qa_data = db["qa_data"]
+
 resumes = db["resumes"]
+
 documents = db["documents"]
 
+
+# ---------------------------------------------------------
+# CONNECTION TEST
+# ---------------------------------------------------------
 def ping():
-    """Small helper used at startup / by scripts to confirm connectivity."""
+    """
+    Check whether MongoDB Atlas is reachable.
+    Returns True if connection works.
+    """
+
     try:
         client.admin.command("ping")
+
+        print("MongoDB Atlas connection: SUCCESS")
+
         return True
-    except PyMongoError:
+
+    except PyMongoError as exc:
+
+        print("MongoDB Atlas connection: FAILED")
+        print("MongoDB error:", exc)
+
         return False
