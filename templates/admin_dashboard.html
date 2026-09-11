@@ -1,7 +1,60 @@
 {% extends "base.html" %}
 {% block title %}Admin Dashboard - Placementor AI{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+<style>
+  /* =====================================================
+     USER USAGE HISTORY
+     ===================================================== */
+
+  .user-usage-card {
+    margin-top: 24px;
+  }
+
+  .user-usage-wrap {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    margin-top: 12px;
+  }
+
+  .user-usage-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #91a4d2;
+    font-size: 14px;
+  }
+
+  .usage-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .usage-user {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(124, 140, 255, .08);
+    border: 1px solid rgba(124, 140, 255, .16);
+    color: #cbd4ff;
+    font-size: 13px;
+  }
+
+  .usage-user strong {
+    color: #ffffff;
+  }
+
+  @media (max-width: 700px) {
+    .user-usage-wrap {
+      height: 300px;
+    }
+  }
+</style>
 {% endblock %}
 
 {% block body %}
@@ -10,9 +63,15 @@
     <a href="{{ url_for('landing') }}" class="brand" style="font-size:15px;">
       <span class="brand-mark" style="width:30px;height:30px;">
         <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="40" height="40" rx="11" fill="url(#adGrad)"/>
-          <path d="M9 23 L17 15 L23 20 L31 9" stroke="#0A0E1C" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <defs><linearGradient id="adGrad" x1="0" y1="0" x2="40" y2="40"><stop offset="0" stop-color="#F2B84B"/><stop offset="1" stop-color="#7C8CFF"/></linearGradient></defs>
+          <rect width="40" height="40" rx="11" fill="url(#adGrad)" />
+          <path d="M9 23 L17 15 L23 20 L31 9" stroke="#0A0E1C" stroke-width="3.2" fill="none" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <defs>
+            <linearGradient id="adGrad" x1="0" y1="0" x2="40" y2="40">
+              <stop offset="0" stop-color="#F2B84B" />
+              <stop offset="1" stop-color="#7C8CFF" />
+            </linearGradient>
+          </defs>
         </svg>
       </span>
       Placementor
@@ -25,15 +84,38 @@
 
     <div class="header-actions">
       <button class="theme-toggle" data-theme-toggle aria-label="Toggle dark / light theme">
-        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3
+                   7 7 0 0 0 21 12.79z" />
+        </svg>
+
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2
+                   M4.9 4.9l1.4 1.4
+                   M17.7 17.7l1.4 1.4
+                   M2 12h2M20 12h2
+                   M4.9 19.1l1.4-1.4
+                   M17.7 6.3l1.4-1.4" />
+        </svg>
       </button>
+
       <div class="user-pill">
-        <span class="user-avatar">{{ (admin_username[0] if admin_username else "A")|upper }}</span>
+        <span class="user-avatar">
+          {{ (admin_username[0] if admin_username else "A")|upper }}
+        </span>
         <span>{{ admin_username }}</span>
       </div>
+
       <a href="{{ url_for('admin_logout') }}" class="icon-btn" aria-label="Log out" title="Log out">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5
+                   a2 2 0 0 1 2-2h4" />
+          <path d="M16 17l5-5-5-5M21 12H9" />
+        </svg>
       </a>
     </div>
   </div>
@@ -41,131 +123,683 @@
 
 <main class="admin-main">
   <div class="container">
+
     <div class="admin-tabs">
-      <button class="admin-tab is-active" data-tab="overview">Overview</button>
-      <button class="admin-tab" data-tab="users">Users</button>
-      <button class="admin-tab" data-tab="chats">Chat History</button>
+      <button class="admin-tab is-active" data-tab="overview">
+        Overview
+      </button>
+
+      <button class="admin-tab" data-tab="users">
+        Users
+      </button>
+
+      <button class="admin-tab" data-tab="chats">
+        Chat History
+      </button>
     </div>
 
+
     <!-- ============ OVERVIEW ============ -->
+
     <div class="admin-panel is-active" data-panel="overview">
 
       <div class="stat-grid">
+
+        <!-- TOTAL USERS -->
         <div class="card stat-card">
           <div class="stat-top">
-            <span class="stat-icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <span class="stat-icon gold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
           </div>
-          <div class="stat-value skeleton" id="stat-total-users" style="height:1.7rem;width:60px;">&nbsp;</div>
-          <div class="stat-label">Total Users</div>
+
+          <div class="stat-value skeleton" id="stat-total-users" style="height:1.7rem;width:60px;">
+            &nbsp;
+          </div>
+
+          <div class="stat-label">
+            Total Users
+          </div>
         </div>
 
+
+        <!-- TOTAL CHATS -->
         <div class="card stat-card">
           <div class="stat-top">
-            <span class="stat-icon violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+            <span class="stat-icon violet">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5
+                         a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </span>
           </div>
-          <div class="stat-value skeleton" id="stat-total-chats" style="height:1.7rem;width:60px;">&nbsp;</div>
-          <div class="stat-label">Total Chats</div>
+
+          <div class="stat-value skeleton" id="stat-total-chats" style="height:1.7rem;width:60px;">
+            &nbsp;
+          </div>
+
+          <div class="stat-label">
+            Total Chats
+          </div>
+
           <div class="stat-sub" id="stat-chats-sub"></div>
         </div>
 
+
+        <!-- AVG RESPONSE -->
         <div class="card stat-card">
           <div class="stat-top">
-            <span class="stat-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+            <span class="stat-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 3" />
+              </svg>
+            </span>
           </div>
-          <div class="stat-value skeleton" id="stat-avg-response" style="height:1.7rem;width:70px;">&nbsp;</div>
-          <div class="stat-label">Avg Response Time</div>
+
+          <div class="stat-value skeleton" id="stat-avg-response" style="height:1.7rem;width:70px;">
+            &nbsp;
+          </div>
+
+          <div class="stat-label">
+            Avg Response Time
+          </div>
+
           <div class="stat-sub" id="stat-avg-sub"></div>
         </div>
 
+
+        <!-- KNOWLEDGE BASE -->
         <div class="card stat-card">
           <div class="stat-top">
-            <span class="stat-icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
+            <span class="stat-icon gold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="8" ry="3" />
+                <path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5" />
+                <path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" />
+              </svg>
+            </span>
           </div>
-          <div class="stat-value skeleton" id="stat-kb-size" style="height:1.7rem;width:50px;">&nbsp;</div>
-          <div class="stat-label">Knowledge Base Size</div>
+
+          <div class="stat-value skeleton" id="stat-kb-size" style="height:1.7rem;width:50px;">
+            &nbsp;
+          </div>
+
+          <div class="stat-label">
+            Knowledge Base Size
+          </div>
+
           <div class="stat-sub" id="stat-kb-sub"></div>
         </div>
+
       </div>
 
+
+      <!-- ============ EXISTING CHARTS ============ -->
+
       <div class="chart-grid">
+
+        <!-- ANSWER SOURCE -->
         <div class="card chart-card">
+
           <div class="chart-card-head">
             <div>
               <h3>Answer Source</h3>
               <p>Knowledge base vs Ollama AI</p>
             </div>
           </div>
+
           <div class="chart-canvas-wrap">
             <canvas id="chart-source"></canvas>
           </div>
+
           <div class="legend-row" id="source-legend"></div>
+
         </div>
 
+
+        <!-- CHAT ACTIVITY -->
         <div class="card chart-card">
+
           <div class="chart-card-head">
             <div>
               <h3>Chat Activity</h3>
               <p>Questions asked over time</p>
             </div>
+
             <div class="seg-toggle">
-              <button class="is-active" data-activity-view="daily">Daily</button>
-              <button data-activity-view="weekly">Weekly</button>
+              <button class="is-active" data-activity-view="daily">
+                Daily
+              </button>
+
+              <button data-activity-view="weekly">
+                Weekly
+              </button>
             </div>
           </div>
+
           <div class="chart-canvas-wrap tall">
             <canvas id="chart-activity"></canvas>
           </div>
+
           <div class="legend-row">
-            <span class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>Knowledge Base</span>
-            <span class="legend-item"><span class="legend-dot" style="background:var(--violet)"></span>Ollama AI</span>
+            <span class="legend-item">
+              <span class="legend-dot" style="background:var(--teal)">
+              </span>
+              Knowledge Base
+            </span>
+
+            <span class="legend-item">
+              <span class="legend-dot" style="background:var(--violet)">
+              </span>
+              Ollama AI
+            </span>
           </div>
+
         </div>
+
       </div>
+
+
+      <!-- =====================================================
+           NEW USER USAGE HISTORY
+           ===================================================== -->
+
+      <div class="card chart-card user-usage-card">
+
+        <div class="chart-card-head">
+
+          <div>
+            <h3>User Usage History</h3>
+
+            <p>
+              Time spent by each student on Placementor AI
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="user-usage-wrap">
+
+          <canvas id="chart-user-usage"></canvas>
+
+          <div id="user-usage-empty" class="user-usage-empty" style="display:none;">
+            No user usage data available yet.
+          </div>
+
+        </div>
+
+
+        <div class="legend-row">
+          <span class="legend-item">
+            <span class="legend-dot" style="background:var(--violet)">
+            </span>
+
+            Usage Time (minutes)
+          </span>
+        </div>
+
+
+        <div id="usage-summary" class="usage-summary">
+        </div>
+
+      </div>
+
+
+      <!-- ============ MOST ASKED QUESTIONS ============ -->
 
       <div class="card chart-card">
+
         <div class="chart-card-head">
+
           <div>
             <h3>Most Asked Questions</h3>
-            <p>Ranked by number of times asked, across all students</p>
+
+            <p>
+              Ranked by number of times asked,
+              across all students
+            </p>
           </div>
+
         </div>
+
         <div class="rank-list" id="top-questions-list">
-          <div class="skeleton" style="height:16px;margin-bottom:10px;"></div>
-          <div class="skeleton" style="height:16px;margin-bottom:10px;width:90%;"></div>
-          <div class="skeleton" style="height:16px;width:80%;"></div>
+
+          <div class="skeleton" style="height:16px;margin-bottom:10px;">
+          </div>
+
+          <div class="skeleton" style="height:16px;margin-bottom:10px;width:90%;">
+          </div>
+
+          <div class="skeleton" style="height:16px;width:80%;">
+          </div>
+
         </div>
+
       </div>
+
     </div>
 
+
     <!-- ============ USERS ============ -->
+
     <div class="admin-panel" data-panel="users">
+
       <div class="card table-card">
+
         <div class="table-card-head">
           <h3>Registered Users</h3>
         </div>
+
         <div id="users-table-wrap">
-          <div class="table-empty">Loading users…</div>
+          <div class="table-empty">
+            Loading users…
+          </div>
         </div>
+
       </div>
+
     </div>
 
+
     <!-- ============ CHAT HISTORY ============ -->
+
     <div class="admin-panel" data-panel="chats">
+
       <div class="card table-card">
+
         <div class="table-card-head">
           <h3>Recent Chat History</h3>
         </div>
+
         <div id="chats-table-wrap">
-          <div class="table-empty">Loading chat history…</div>
+          <div class="table-empty">
+            Loading chat history…
+          </div>
         </div>
+
       </div>
+
     </div>
 
   </div>
 </main>
+
 {% endblock %}
 
+
 {% block scripts %}
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+
 <script src="{{ url_for('static', filename='js/admin.js') }}" defer></script>
+
+
+<!-- =========================================================
+     USER USAGE HISTORY SCRIPT
+     ========================================================= -->
+
+<script>
+
+  let userUsageChart = null;
+
+
+  async function loadUserUsageHistory() {
+
+    const canvas =
+      document.getElementById(
+        "chart-user-usage"
+      );
+
+    const emptyMessage =
+      document.getElementById(
+        "user-usage-empty"
+      );
+
+    const summary =
+      document.getElementById(
+        "usage-summary"
+      );
+
+
+    if (!canvas) {
+      return;
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/admin/api/user-usage",
+          {
+            method: "GET",
+            credentials: "same-origin"
+          }
+        );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          "Could not load user usage data."
+        );
+
+      }
+
+
+      const users =
+        await response.json();
+
+
+      /*
+       * No users / no usage
+       */
+
+      if (!Array.isArray(users) ||
+        users.length === 0) {
+
+        if (userUsageChart) {
+          userUsageChart.destroy();
+          userUsageChart = null;
+        }
+
+        canvas.style.display = "none";
+
+        if (emptyMessage) {
+          emptyMessage.style.display =
+            "flex";
+        }
+
+        if (summary) {
+          summary.innerHTML = "";
+        }
+
+        return;
+      }
+
+
+      canvas.style.display = "block";
+
+      if (emptyMessage) {
+        emptyMessage.style.display =
+          "none";
+      }
+
+
+      const labels =
+        users.map(
+          user =>
+            user.username || "Unknown"
+        );
+
+
+      const minutes =
+        users.map(
+          user =>
+            Number(user.minutes || 0)
+        );
+
+
+      /*
+       * Create / refresh graph
+       */
+
+      if (userUsageChart) {
+        userUsageChart.destroy();
+      }
+
+
+      userUsageChart =
+        new Chart(
+          canvas,
+          {
+            type: "bar",
+
+            data: {
+
+              labels: labels,
+
+              datasets: [
+
+                {
+                  label:
+                    "Usage Time (minutes)",
+
+                  data: minutes,
+
+                  borderWidth: 1,
+
+                  borderRadius: 8,
+
+                  maxBarThickness: 55
+                }
+
+              ]
+
+            },
+
+
+            options: {
+
+              responsive: true,
+
+              maintainAspectRatio: false,
+
+
+              interaction: {
+                mode: "index",
+                intersect: false
+              },
+
+
+              plugins: {
+
+                legend: {
+                  display: false
+                },
+
+
+                tooltip: {
+
+                  callbacks: {
+
+                    title:
+                      function (context) {
+
+                        return (
+                          context[0].label
+                        );
+
+                      },
+
+
+                    label:
+                      function (context) {
+
+                        const value =
+                          Number(
+                            context.raw || 0
+                          );
+
+                        return (
+                          " Usage: " +
+                          value +
+                          " minutes"
+                        );
+
+                      }
+
+                  }
+
+                }
+
+              },
+
+
+              scales: {
+
+                y: {
+
+                  beginAtZero: true,
+
+                  ticks: {
+
+                    callback:
+                      function (value) {
+
+                        return (
+                          value +
+                          " min"
+                        );
+
+                      }
+
+                  },
+
+                  title: {
+
+                    display: true,
+
+                    text:
+                      "Usage Time (minutes)"
+
+                  }
+
+                },
+
+
+                x: {
+
+                  title: {
+
+                    display: true,
+
+                    text:
+                      "Students"
+
+                  }
+
+                }
+
+              }
+
+            }
+
+          }
+        );
+
+
+      /*
+       * Small summary below graph
+       */
+
+      if (summary) {
+
+        summary.innerHTML =
+          users
+            .slice(0, 10)
+            .map(
+              user => {
+
+                const name =
+                  user.username ||
+                  "Unknown";
+
+                const value =
+                  Number(
+                    user.minutes || 0
+                  );
+
+                return `
+                  <div class="usage-user">
+                    <strong>${escapeHtml(name)}</strong>
+                    &nbsp; ${value} min
+                  </div>
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "User usage history error:",
+        error
+      );
+
+      if (userUsageChart) {
+        userUsageChart.destroy();
+        userUsageChart = null;
+      }
+
+      canvas.style.display = "none";
+
+      if (emptyMessage) {
+        emptyMessage.textContent =
+          "Unable to load user usage data.";
+        emptyMessage.style.display =
+          "flex";
+      }
+
+    }
+
+  }
+
+
+  /*
+   * Prevent usernames from being inserted
+   * directly as HTML in the summary.
+   */
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  /*
+   * Load when dashboard opens.
+   */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+      loadUserUsageHistory();
+
+    }
+  );
+
+
+  /*
+   * Refresh every 30 seconds.
+   * This means the admin dashboard can show
+   * updated usage while students are using the app.
+   */
+
+  setInterval(
+    loadUserUsageHistory,
+    30000
+  );
+
+</script>
+
 {% endblock %}
