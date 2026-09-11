@@ -585,6 +585,10 @@ def register():
                 datetime.now(
                     timezone.utc
                 ),
+            "total_usage_seconds": 0,
+            "last_seen": datetime.now(
+                timezone.utc
+            ),
         }
     )
 
@@ -713,6 +717,21 @@ def login():
         )
     )
 
+    # Start/resume user usage tracking.
+    users.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "last_seen": datetime.now(
+                    timezone.utc
+                )
+            },
+            "$setOnInsert": {
+                "total_usage_seconds": 0
+            }
+        }
+    )
+
     return respond(
         is_json,
         "Welcome back!",
@@ -751,6 +770,165 @@ def logout():
         url_for(
             "landing"
         )
+    )
+
+
+# =========================================================
+# USER ACTIVITY / USAGE TRACKING
+# =========================================================
+
+@app.route(
+    "/api/user-activity",
+    methods=["POST"]
+)
+@user_api_required
+def user_activity():
+
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({
+            "success": False,
+            "message": "Not logged in."
+        }), 401
+
+    try:
+        object_id = ObjectId(user_id)
+    except (InvalidId, TypeError):
+        return jsonify({
+            "success": False,
+            "message": "Invalid user."
+        }), 400
+
+    now = datetime.now(timezone.utc)
+
+    user = users.find_one(
+        {"_id": object_id}
+    )
+
+    if not user:
+        return jsonify({
+            "success": False,
+            "message": "User not found."
+        }), 404
+
+    last_seen = user.get("last_seen")
+
+    if not isinstance(last_seen, datetime):
+        users.update_one(
+            {"_id": object_id},
+            {
+                "$set": {
+                    "last_seen": now
+                },
+                "$setOnInsert": {
+                    "total_usage_seconds": 0
+                }
+            },
+            upsert=True
+        )
+
+        return jsonify({
+            "success": True,
+            "added_seconds": 0
+        })
+
+    if last_seen.tzinfo is None:
+        last_seen = last_seen.replace(
+            tzinfo=timezone.utc
+        )
+
+    elapsed = (
+        now - last_seen
+    ).total_seconds()
+
+    # Ignore very large gaps caused by a closed/inactive browser.
+    elapsed = max(
+        0,
+        min(elapsed, 90)
+    )
+
+    users.update_one(
+        {"_id": object_id},
+        {
+            "$inc": {
+                "total_usage_seconds": elapsed
+            },
+            "$set": {
+                "last_seen": now
+            }
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "added_seconds": round(
+            elapsed,
+            1
+        )
+    })
+
+
+# =========================================================
+# ADMIN USER USAGE
+# =========================================================
+
+@app.route(
+    "/admin/api/user-usage",
+    methods=["GET"]
+)
+@admin_api_required
+def admin_user_usage():
+
+    usage_data = []
+
+    cursor = users.find(
+        {},
+        {
+            "_id": 0,
+            "username": 1,
+            "email": 1,
+            "total_usage_seconds": 1
+        }
+    )
+
+    for user in cursor:
+
+        seconds = float(
+            user.get(
+                "total_usage_seconds",
+                0
+            ) or 0
+        )
+
+        minutes = round(
+            seconds / 60,
+            1
+        )
+
+        usage_data.append({
+            "username": user.get(
+                "username",
+                "Unknown"
+            ),
+            "email": user.get(
+                "email",
+                ""
+            ),
+            "seconds": round(
+                seconds,
+                1
+            ),
+            "minutes": minutes
+        })
+
+    usage_data.sort(
+        key=lambda item: item["minutes"],
+        reverse=True
+    )
+
+    return jsonify(
+        usage_data
     )
 
 
