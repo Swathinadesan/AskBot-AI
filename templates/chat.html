@@ -129,6 +129,69 @@
     }
   }
 </style>
+
+<script>
+  /*
+   * =====================================================
+   * USER USAGE / ACTIVITY TRACKING
+   * =====================================================
+   *
+   * Sends a small activity update to Flask every 30 seconds.
+   * Flask stores the accumulated usage time in MongoDB.
+   */
+
+  (function () {
+
+    async function updateUserActivity() {
+
+      try {
+
+        const response = await fetch(
+          "/api/user-activity",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({})
+          }
+        );
+
+        if (!response.ok) {
+          console.log(
+            "User activity update failed:",
+            response.status
+          );
+        }
+
+      } catch (error) {
+
+        console.log(
+          "User activity update error:",
+          error
+        );
+
+      }
+
+    }
+
+    /*
+     * Start tracking when the chat page is opened.
+     */
+    updateUserActivity();
+
+    /*
+     * Update every 30 seconds.
+     */
+    setInterval(
+      updateUserActivity,
+      30000
+    );
+
+  })();
+</script>
+
 {% endblock %}
 
 
