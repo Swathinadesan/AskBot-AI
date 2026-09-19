@@ -12,7 +12,7 @@
   <script>
     (function () {
       try {
-        var saved = localStorage.getItem("placementor-theme");
+        var saved = localStorage.getItem("AskBot-theme");
         var theme = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
         document.documentElement.setAttribute("data-theme", theme);
       } catch (e) {
