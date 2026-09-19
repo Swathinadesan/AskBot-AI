@@ -1,5 +1,5 @@
 """
-Ollama Cloud client for Placementor AI.
+Ollama Cloud client for AskBot AI.
 
 This replaces the old local-only Ollama usage (http://localhost:11434) with
 Ollama's hosted Cloud API (https://ollama.com/api), authenticated with an
@@ -24,7 +24,7 @@ OLLAMA_GENERATE_URL = f"{OLLAMA_BASE_URL}/api/generate"
 OLLAMA_TIMEOUT_SECONDS = int(os.environ.get("OLLAMA_TIMEOUT_SECONDS", "120"))
 
 SYSTEM_PROMPT = (
-    "You are Placementor AI, a friendly and encouraging placement and interview "
+    "You are AskBot AI, a friendly and encouraging placement and interview "
     "preparation assistant for college students. Answer questions about "
     "programming, computer science fundamentals, aptitude, cloud computing, "
     "computer networks, and HR/behavioural interview topics. Keep answers "
@@ -105,3 +105,4 @@ def stream_ollama_response(user_message):
             response.close()
 
     return _generator()
+
