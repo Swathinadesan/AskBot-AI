@@ -2,7 +2,7 @@ from werkzeug.security import generate_password_hash
 from db import admins
 
 username = "admin"
-password = "admin123"
+password = "admin@123"
 
 existing = admins.find_one({"username": username})
 
