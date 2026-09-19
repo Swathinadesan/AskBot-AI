@@ -1,5 +1,5 @@
 """
-MongoDB connection for Placementor AI.
+MongoDB connection for AskBot AI.
 
 Uses MONGO_URI from environment variables.
 Works locally with .env and on Render with Environment Variables.
