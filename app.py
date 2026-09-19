@@ -1,5 +1,5 @@
 """
-Placementor AI - main Flask application.
+AskBot AI - main Flask application.
 
 Flow:
 1. User sends a question.
@@ -1594,7 +1594,7 @@ def chat():
     if "swathi" in user_message.lower():
 
         return Response(
-            "Swathi is the awesome creator behind Placementor AI. 🚀",
+            "Swathi is the awesome creator behind AskBot AI. 🚀",
             mimetype="text/plain",
         )
 
@@ -1679,7 +1679,7 @@ def chat():
         return jsonify(
             {
                 "reply": (
-                    "Placementor AI's cloud assistant "
+                    "AskBot AI's cloud assistant "
                     "is unavailable right now. "
                     "Please try again shortly."
                 )
