@@ -1,4 +1,4 @@
-# Placementor AI
+# AskBot AI
 
 A placement and interview preparation assistant for campus recruitment. Single Flask
 application: landing page, auth, a chatbot that checks a curated MongoDB knowledge
