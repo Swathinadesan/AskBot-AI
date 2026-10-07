@@ -679,16 +679,11 @@ def admin_logout():
 @app.route("/admin-dashboard")
 @admin_page_required
 def admin_dashboard():
-
-    import traceback
-
-    try:
-        return render_template(
-            "admin_dashboard.html",
-            admin_username=session.get("admin_username", "Admin"),
-        )
-    except Exception:
-        return "<pre>" + traceback.format_exc() + "</pre>", 500
+ 
+    return render_template(
+        "admin_dashboard.html",
+        admin_username=session.get("admin_username", "Admin"),
+    )
  
  
 # =========================================================
